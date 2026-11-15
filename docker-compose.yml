@@ -1,10 +1,12 @@
 services:
-  api:
+  api-a:
     build: ./app
     image: flood-assessment-api:latest
-    container_name: flood-assessment-api
+    container_name: flood-assessment-api-a
     ports:
-      - "8000:8000"
+      - "8001:8000"
+    volumes:
+      - flood-shared:/data
     restart: unless-stopped
     healthcheck:
       test:
@@ -12,7 +14,30 @@ services:
         - python
         - -c
         - "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)"
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  api-b:
+    build: ./app
+    image: flood-assessment-api:latest
+    container_name: flood-assessment-api-b
+    ports:
+      - "8002:8000"
+    volumes:
+      - flood-shared:/data
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://localhost:8000/healthz', timeout=5)"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  flood-shared:
